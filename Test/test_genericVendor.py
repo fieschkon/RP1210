@@ -1,5 +1,5 @@
 from ctypes import create_string_buffer
-import pytest
+import pytest, warnings
 import RP1210, os, configparser
 from utilities import RP1210ConfigTestUtility
 
@@ -11,6 +11,13 @@ TEST_FILES_DIRECTORY = CWD + ".\\Test\\test-files"
 INI_DIRECTORY = TEST_FILES_DIRECTORY + "\\ini-files"
 DLL_DIRECTORY = TEST_FILES_DIRECTORY + "\\dlls"
 RP121032_PATH = TEST_FILES_DIRECTORY + "\\RP121032.ini"
+
+def test_repairConfig():
+    config = configparser.ConfigParser()
+    config.read(RP121032_PATH)
+    if(not RP1210.detectMangledConfig(config)):
+        RP1210.repairConfig(config, RP121032_PATH)
+    assert RP1210.detectMangledConfig(config)
 
 def test_cwd():
     """Make sure cwd isn't in Test folder."""
