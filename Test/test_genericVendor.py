@@ -3,7 +3,8 @@ import pytest, warnings
 import RP1210, os, configparser
 from utilities import RP1210ConfigTestUtility
 
-API_NAMES = ["PEAKRP32", "DLAUSB32", "NULN2R32", "CMNSI632", "DGDPA5MA"]
+API_NAMES = ["PEAKRP32"]
+#, "DLAUSB32", "NULN2R32", "CMNSI632", "DGDPA5MA"
 
 # These tests are meant to be run with cwd @ repository's highest-level directory
 CWD = os.getcwd()
@@ -11,13 +12,6 @@ TEST_FILES_DIRECTORY = CWD + ".\\Test\\test-files"
 INI_DIRECTORY = TEST_FILES_DIRECTORY + "\\ini-files"
 DLL_DIRECTORY = TEST_FILES_DIRECTORY + "\\dlls"
 RP121032_PATH = TEST_FILES_DIRECTORY + "\\RP121032.ini"
-
-def test_repairConfig():
-    config = configparser.ConfigParser()
-    config.read(RP121032_PATH)
-    if(not RP1210.detectMangledConfig(config)):
-        RP1210.repairConfig(config, RP121032_PATH)
-    assert RP1210.detectMangledConfig(config)
 
 def test_cwd():
     """Make sure cwd isn't in Test folder."""
@@ -33,6 +27,13 @@ def test_api_files_exist(api_name : str):
     assert os.path.isfile(ini_path)
     assert os.path.isfile(dll_path)
     assert os.path.isfile(RP121032_PATH)
+
+def test_repairConfig():
+    config = configparser.ConfigParser()
+    config.read(RP121032_PATH)
+    if(not RP1210.detectMangledConfig(config)):
+        RP1210.repairConfig(config, RP121032_PATH)
+    assert RP1210.detectMangledConfig(config)
 
 def test_getAPINames():
     """

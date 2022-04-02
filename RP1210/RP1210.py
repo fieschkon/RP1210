@@ -181,35 +181,40 @@ def detectMangledConfig(parser : configparser) -> bool:
         return False
         
 
-def repairConfig(parser : configparser, path : str):
-    # TODO: Test the passes
+def repairConfig(parser : configparser, path : str) -> bool:
     '''
     Repairs the config file by removing duplicate API entries, removing empty entries,
-    and repairing broken section and field names.
+    and repairing broken section and field names. Returns True if successful
     '''
-    if(not parser.has_option("RP1210Support", "APIImplementations")):
-        parser['RP1210Support'] = {}
-        for section in parser.sections():
-            for field in list(dict(parser.items(section))):
-                parser["RP1210Support"]["APIImplementations"] = parser[section][field] # Move API names into proper field
+    try:
+        if(not parser.has_option("RP1210Support", "APIImplementations")):
+            parser['RP1210Support'] = {}
+            for section in parser.sections():
+                for field in list(dict(parser.items(section))):
+                    parser["RP1210Support"]["APIImplementations"] = parser[section][field] # Move API names into proper field
 
 
-    #parser["RP1210Support"]["APIImplementations_OLD"] = parser["RP1210Support"]["APIImplementations"] # Backs up old section in case we break something and want to roll back
-    items = parser.get("RP1210Support", "APIImplementations").split(",")
- 
-    initialscreen = []
-    for item in items:
-        initialscreen.append(''.join(filter(str.isalnum, item)))
+        #parser["RP1210Support"]["APIImplementations_OLD"] = parser["RP1210Support"]["APIImplementations"] # Backs up old section in case we break something and want to roll back
+        items = parser.get("RP1210Support", "APIImplementations").split(",")
+    
+        initialscreen = []
+        for item in items:
+            initialscreen.append(''.join(filter(str.isalnum, item)))
 
-    firstpass = list(filter(lambda x: x != "" and x != " ", initialscreen)) # Filters out empty and blank api names
-    secondpass = [] # Remove duplicates
-    for i in firstpass:
-        if i not in secondpass:
-            secondpass.append(i)
+        firstpass = list(filter(lambda x: x != "" and x != " ", initialscreen)) # Filters out empty and blank api names
+        secondpass = [] # Remove duplicates
+        for i in firstpass:
+            if i not in secondpass:
+                secondpass.append(i)
 
-    parser["RP1210Support"]["APIImplementations"] = ','.join(secondpass)
-    with open(path, 'w') as configfile:
-        parser.write(configfile)
+        parser["RP1210Support"]["APIImplementations"] = ','.join(secondpass)
+        with open(path, 'w') as configfile:
+            parser.write(configfile)
+        return True
+        
+    except:
+        return False
+
 
 
 class RP1210Protocol:
